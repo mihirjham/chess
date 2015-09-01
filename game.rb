@@ -11,7 +11,7 @@ class Game
   def run
     until @board.win?
       pos = @player.move
-      @board.mark(pos)
+      #@board.mark(pos)
     end
   end
 end

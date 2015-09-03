@@ -18,4 +18,8 @@ class King < Piece
       return " ♚ "
     end
   end
+
+  def is_king?
+    true
+  end
 end

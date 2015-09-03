@@ -30,10 +30,10 @@ class Board
         @grid[7][col] = Bishop.new([7,col], :white, self)
       elsif(col == 3)
         @grid[0][col] = Queen.new([0,col], :black, self)
-        @grid[7][col] = King.new([7,col], :white, self)
+        @grid[7][col] = Queen.new([7,col], :white, self)
       elsif(col == 4)
         @grid[0][col] = King.new([0,col], :black, self)
-        @grid[7][col] = Queen.new([7,col], :white, self)
+        @grid[7][col] = King.new([7,col], :white, self)
       end
     end
 
@@ -62,6 +62,77 @@ class Board
     true
   end
 
+  def make_move(start_pos, end_pos)
+    start_piece = @grid[start_pos[0]][start_pos[1]]
+    end_piece = @grid[end_pos[0]][end_pos[1]]
+
+    if start_piece.valid_moves.include?(end_piece.position)
+      start_piece.update_pos(end_pos)
+      @grid[end_pos[0]][end_pos[1]] = start_piece
+      @grid[start_pos[0]][start_pos[1]] = EmptyPiece.new(start_pos, self)
+    end
+  end
+
+  def make_move!(start_pos, end_pos)
+    start_piece = @grid[start_pos[0]][start_pos[1]]
+    end_piece = @grid[end_pos[0]][end_pos[1]]
+
+    start_piece.update_pos(end_pos)
+    @grid[end_pos[0]][end_pos[1]] = start_piece
+    @grid[start_pos[0]][start_pos[1]] = EmptyPiece.new(start_pos, self)
+  end
+
+  def in_check?(color)
+    king_position = find_king(color)
+    color == :black ? (other_color = :white) : (other_color = :black)
+    (0..7).each do |row|
+      (0..7).each do |col|
+        if @grid[row][col].color == other_color
+          @grid[row][col].possible_moves.each do |position|
+            if position == king_position
+              return true
+            end
+          end
+        end
+      end
+    end
+    false
+  end
+
+  def in_checkmate?(color)
+    # king_postion = find_king(color)
+    if self.in_check?(color)
+      (0..7).each do |row|
+        (0..7).each do |col|
+          if(@grid[row][col].color == color)
+            return false if !@grid[row][col].valid_moves.empty?
+          end
+        end
+      end
+      return true
+    end
+    false
+  end
+
+  def dup
+    new_board = Board.new
+    (0..7).each do |row|
+      (0..7).each do |col|
+        new_board.grid[row][col] = @grid[row][col].dup(new_board)
+      end
+    end
+    new_board
+  end
+
+  def find_king(color)
+    (0..7).each do |row|
+      (0..7).each do |col|
+        if(@grid[row][col].is_king? && @grid[row][col].color == color)
+          return [row,col]
+        end
+      end
+    end
+  end
 
   # Duck type (quack)
   def empty?(position)

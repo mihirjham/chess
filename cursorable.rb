@@ -41,7 +41,8 @@ module Cursorable
     when :ctrl_c
       exit 0
     when :return, :space
-      @selected_pos = @cursor_pos
+      selected_pos = @cursor_pos
+      @possible_moves = @board.grid[selected_pos[0]][selected_pos[1]].valid_moves
       @cursor_pos
     when :left, :right, :up, :down
       update_pos(MOVES[key])
@@ -71,4 +72,5 @@ module Cursorable
     new_pos = [@cursor_pos[0] + diff[0], @cursor_pos[1] + diff[1]]
     @cursor_pos = new_pos if @board.in_bounds?(new_pos)
   end
+
 end

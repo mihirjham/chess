@@ -10,7 +10,7 @@ class Display
   def initialize(board)
     @board = board
     @cursor_pos = [0,0]
-    @selected_pos = []
+    @possible_moves = []
   end
 
   def build_grid
@@ -29,6 +29,8 @@ class Display
   def colors_for(i, j)
     if [i,j] == @cursor_pos
       bg = :light_red
+    elsif @possible_moves.include?([i,j])
+      bg = :yellow
     elsif (i + j).odd?
       bg = :light_blue
     else
@@ -39,14 +41,8 @@ class Display
 
   def render
     system("clear")
-    grid_colored = build_grid.each {|row| puts row.join}
-    p @cursor_pos
-    p @selected_pos
-    if(@selected_pos != [])
-      @board.grid[@selected_pos[0]][@selected_pos[1]].possible_moves.each do |move|
-        grid_colored[move[0]][move[1]] = @board.grid[move[0]][move[1]].to_s.colorize({bg: :white, color: :white})
-      end
-    end
-    grid_colored
+    build_grid.each {|row| puts row.join}
+    p "White checkmate? : #{@board.in_checkmate?(:white)}"
+    p "Black checkmate? : #{@board.in_checkmate?(:black)}";
   end
 end
